@@ -77,6 +77,8 @@ REST_FRAMEWORK = {
 
 REST_USE_JWT = True
 
+SITE_ID = 1
+
 REST_AUTH = {
     "USE_JWT": True,
     "JWT_AUTH_COOKIE": "access_token",
