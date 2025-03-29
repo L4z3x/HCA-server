@@ -33,6 +33,6 @@ python3 manage.py spectacular --file schema.yml
 echo  "${GREEN}==> The Database has been updated${NC}"
 
 echo  "${YELLOW}==> Creating superuser...${NC}"
-if [ "$CONTAINER_NAME" = "django-app" ]; then
-  cat create_superuser.py | python3 manage.py shell
-fi
+# if [ "$CONTAINER_NAME" = "django-app" ]; then
+cat create_superuser.py | python3 manage.py shell
+# fi
