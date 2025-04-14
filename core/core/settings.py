@@ -3,17 +3,9 @@ from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-s4r7za-8fuu%vfr$(ra!1!lo5wb8a6a=a3vd@0w(6en9w%pudz"
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-ALLOWED_HOSTS = []
-
-# Internationalization
-# https://docs.djangoproject.com/en/5.1/topics/i18n/
 
 LANGUAGE_CODE = "en-us"
 
@@ -25,21 +17,12 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
-
 STATIC_URL = "static/"
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 TOKEN_MODEL = None
 
-
-# Application definition
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -65,11 +48,9 @@ INSTALLED_APPS = [
     "blog",
 ]
 
-# CORS settings
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    # "https://7e73-154-121-93-102.ngrok-free.app",
 ]
 
 CORS_ALLOWS_CREDENTIALS = True
@@ -100,15 +81,13 @@ REST_AUTH = {
     "JWT_AUTH_REFRESH_COOKIE_PATH": "/auth/token/get-refresh/",
     "TOKEN_MODEL": None,
     "OLD_PASSWORD_FIELD_ENABLED": True,
-    "JWT_AUTH_HTTPONLY": True,  # enable this to allow javascript to access the cookie (refresh token)
-    """
-    
+    "JWT_AUTH_HTTPONLY": False,  # enable this to allow javascript to access the cookie (refresh token)
+    """    
     there is a problem with the httponly flag,
     it will associate every request with that cookie
     and that will raise an error in simplejwt, so we need to disable it for now  
     we must not send access_tokens (cookie) in requests to the allowAny endpoints e.g. login
     https://forum.djangoproject.com/t/solved-allowany-override-does-not-work-on-apiview/9754
-    
     """
     "JWT_AUTH_SECURE": not DEBUG,  # False for development
     "JWT_AUTH_COOKIE_ENFORCE_CSRF_ON_UNAUTHENTICATED": not DEBUG,  # False for developement

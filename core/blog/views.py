@@ -5,7 +5,12 @@ from rest_framework.response import Response
 from rest_framework import status
 from blog.serializers import BlogSerializer, BlogListSerializer
 from blog.models import Blog
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import (
+    ListAPIView,
+    UpdateAPIView,
+    DestroyAPIView,
+    RetrieveAPIView,
+)
 from rest_framework.pagination import PageNumberPagination
 
 
@@ -35,3 +40,35 @@ class BlogListView(ListAPIView):
 
     def get(self, request):
         return self.list(request)
+
+
+class GetBlogView(RetrieveAPIView):
+    """
+    Get blog by id
+    """
+
+    lookup_field = "id"
+    permission_classes = [AllowAny]
+    serializer_class = BlogSerializer
+
+    def get_queryset(self):
+        return Blog.objects.filter(id=self.kwargs.get("id"))
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+
+class BlogView(UpdateAPIView, DestroyAPIView):
+    # permission_classes = [IsWriter]
+    permission_classes = [IsAuthenticated]
+    serializer_class = BlogSerializer
+    lookup_field = "id"
+
+    def get_queryset(self):
+        return Blog.objects.filter(id=self.kwargs.get("id"))
+
+    def put(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
