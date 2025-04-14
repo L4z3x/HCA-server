@@ -62,12 +62,14 @@ INSTALLED_APPS = [
     "allauth.account",
     # local apps:
     "user",
+    "blog",
 ]
 
 # CORS settings
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    # "https://7e73-154-121-93-102.ngrok-free.app",
 ]
 
 ALLOWED_HOSTS = ["*"]
