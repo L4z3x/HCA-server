@@ -190,3 +190,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # Email backend configuration for local development
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
 EMAIL_FILE_PATH = BASE_DIR / "sent_emails"  # Directory to store sent emails
+
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media"

@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from .models import Blog
+from .models import Blog, Comment
 
 
 class BlogSerializer(ModelSerializer):
@@ -31,3 +31,14 @@ class BlogListSerializer(ModelSerializer):
         # extra_kwargs = {
         #     "title": {"required": True},
         # }
+
+
+class CommentSerializer(ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ["id", "body", "blog", "author", "created_at", "updated_at"]
+        read_only_fields = ["id", "created_at", "updated_at"]
+        extra_kwargs = {
+            "body": {"required": True},
+            "author": {"required": False},
+        }

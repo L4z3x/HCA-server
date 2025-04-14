@@ -3,11 +3,12 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from blog.permissions import IsWriter
 from rest_framework.response import Response
 from rest_framework import status
-from blog.serializers import BlogSerializer, BlogListSerializer
-from blog.models import Blog
+from blog.serializers import BlogSerializer, CommentSerializer, BlogListSerializer
+from blog.models import Blog, Comment
 from rest_framework.generics import (
     ListAPIView,
     UpdateAPIView,
+    CreateAPIView,
     DestroyAPIView,
     RetrieveAPIView,
 )
@@ -72,3 +73,57 @@ class BlogView(UpdateAPIView, DestroyAPIView):
 
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
+
+
+class CommentListView(ListAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = CommentSerializer
+    lookup_field = "blog_id"
+
+    def get_queryset(self):
+        return Comment.objects.filter(blog=self.kwargs.get("blog_id"))
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+
+class CommentView(UpdateAPIView, DestroyAPIView, CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = CommentSerializer
+    lookup_field = "id"
+
+    def get_queryset(self):
+        return Comment.objects.filter(id=self.kwargs.get("id"))
+
+    def put(self, request, *args, **kwargs):
+        user = request.user
+        comment = self.get_object()
+        if not comment:
+            return Response(
+                {"error": "Comment not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+        if comment.author != user and not user.role == "admin":
+            return Response(
+                {"error": "You are not allowed to update this comment"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        return self.partial_update(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        user = request.user
+        comment = self.get_object()
+        if not comment:
+            return Response(
+                {"error": "Comment not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+        if comment.author != user and not user.role == "admin":
+            return Response(
+                {"error": "You are not allowed to update this comment"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        return self.destroy(request, *args, **kwargs)
+
+    def post(self, request):
+        request.data["author"] = request.user.id
+        return self.create(request)
