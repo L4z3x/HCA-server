@@ -7,6 +7,8 @@ class Blog(models.Model):
     author = models.ForeignKey(
         "user.user", related_name="blogs", null=False, on_delete=models.CASCADE
     )
+    thumbnail = models.ImageField(upload_to="blog/thumbnails/", null=True, blank=True)
+    # tags = models.CharField(max_length=100, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

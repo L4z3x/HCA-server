@@ -72,6 +72,8 @@ CORS_ALLOWED_ORIGINS = [
     # "https://7e73-154-121-93-102.ngrok-free.app",
 ]
 
+CORS_ALLOWS_CREDENTIALS = True
+
 ALLOWED_HOSTS = ["*"]
 
 REST_FRAMEWORK = {
@@ -83,7 +85,7 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.CursorPagination",
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
 }
 
@@ -98,7 +100,7 @@ REST_AUTH = {
     "JWT_AUTH_REFRESH_COOKIE_PATH": "/auth/token/get-refresh/",
     "TOKEN_MODEL": None,
     "OLD_PASSWORD_FIELD_ENABLED": True,
-    "JWT_AUTH_HTTPONLY": False,  # enable this to allow javascript to access the cookie (refresh token)
+    "JWT_AUTH_HTTPONLY": True,  # enable this to allow javascript to access the cookie (refresh token)
     """
     
     there is a problem with the httponly flag,
@@ -148,6 +150,8 @@ SIMPLE_JWT = {
     "TOKEN_TYPE_CLAIM": "token_type",
     "JTI_CLAIM": "jti",
 }
+
+CSRF_COOKIE_SECURE = False
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
