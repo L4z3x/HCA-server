@@ -30,14 +30,17 @@ def create_blog(request):
     return Response(status=status.HTTP_201_CREATED)
 
 
+class BlogPagination(PageNumberPagination):
+    page_size = 12
+
+
 class BlogListView(ListAPIView):
     """
     List all blogs by recent first
     """
 
     permission_classes = [AllowAny]
-    pagination_class = PageNumberPagination
-    page_size = 12  # default page size
+    pagination_class = BlogPagination
     serializer_class = BlogListSerializer
     queryset = Blog.objects.all().order_by("-created_at")
 
