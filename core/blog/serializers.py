@@ -14,7 +14,12 @@ class BlogSerializer(ModelSerializer):
             "updated_at",
             "thumbnail",
         ]
-        read_only_fields = ["id", "author", "created_at", "updated_at"]
+        read_only_fields = [
+            "id",
+            "author",
+            "created_at",
+            "updated_at",
+        ]
         extra_kwargs = {
             "title": {"required": True},
             "body": {"required": True},
@@ -36,7 +41,14 @@ class BlogListSerializer(ModelSerializer):
 class CommentSerializer(ModelSerializer):
     class Meta:
         model = Comment
-        fields = ["id", "body", "blog", "author", "created_at", "updated_at"]
+        fields = [
+            "id",
+            "body",
+            "blog",
+            "author",
+            "created_at",
+            "updated_at",
+        ]
         read_only_fields = ["id", "created_at", "updated_at"]
         extra_kwargs = {
             "body": {"required": True},

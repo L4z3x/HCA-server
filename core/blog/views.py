@@ -2,9 +2,11 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from blog.permissions import IsWriter
 from rest_framework.response import Response
+from core.settings import BASE_URL
 from rest_framework import status
 from blog.serializers import BlogSerializer, CommentSerializer, BlogListSerializer
 from blog.models import Blog, Comment
+from user.models import user
 from rest_framework.generics import (
     ListAPIView,
     UpdateAPIView,
@@ -56,7 +58,22 @@ class GetBlogView(RetrieveAPIView):
         return Blog.objects.filter(id=self.kwargs.get("id"))
 
     def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
+        res = self.retrieve(request, *args, **kwargs)
+        if res.status_code == 200:
+            author_id = res.data["author"]
+            author = user.objects.filter(id=author_id).first()
+            if author:
+                res.data["author"] = {
+                    "id": author.id,
+                    "username": author.username,
+                    "profilePic": f"{BASE_URL}{author.profilePic.url}"
+                    if author.profilePic
+                    else None,
+                }
+            else:
+                res.data["author"] = None
+            res.data["author_username"] = res.data["author"].get("username")
+        return res
 
 
 class BlogView(UpdateAPIView, DestroyAPIView):
