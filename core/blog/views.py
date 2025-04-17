@@ -101,7 +101,21 @@ class CommentListView(ListAPIView):
         return Comment.objects.filter(blog=self.kwargs.get("blog_id"))
 
     def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+        res = self.list(request, *args, **kwargs)
+        for comment in res.data["results"]:
+            author_id = comment["author"]
+            author = user.objects.filter(id=author_id).first()
+            if author:
+                comment["author"] = {
+                    "id": author.id,
+                    "username": author.username,
+                    "profilePic": f"{BASE_URL}{author.profilePic.url}"
+                    if author.profilePic
+                    else None,
+                }
+            else:
+                comment["author"] = None
+        return res
 
 
 class CommentView(UpdateAPIView, DestroyAPIView, CreateAPIView):
