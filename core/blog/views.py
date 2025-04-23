@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from core.settings import BASE_URL
 from rest_framework import status
 from blog.serializers import BlogSerializer, CommentSerializer, BlogListSerializer
-from blog.models import Blog, Comment
+from blog.models import Blog, Comment, Like
 from user.models import user
 from rest_framework.generics import (
     ListAPIView,
@@ -161,3 +161,33 @@ class CommentView(UpdateAPIView, DestroyAPIView, CreateAPIView):
     def post(self, request):
         request.data["author"] = request.user.id
         return self.create(request)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def like_blog(request, blog_id):
+    user = request.user
+    blog = Blog.objects.filter(id=blog_id).first()
+    if not blog:
+        return Response({"error": "blog not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    Like.objects.get_or_create(author=user, blog=blog)
+    return Response({"message": "blog liked successfully"}, status.HTTP_201_CREATED)
+
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def dislike_blog(request, blog_id):
+    user = request.user
+    blog = Blog.objects.filter(id=blog_id).first()
+    if not blog:
+        return Response({"error": "blog not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    like = Like.objects.filter(author=user, blog=blog).first()
+    if not like:
+        return Response(
+            {"error": "You have not liked this blog"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    like.delete()
+    return Response({"message": "blog disliked successfully"}, status.HTTP_200_OK)
