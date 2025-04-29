@@ -7,6 +7,13 @@ ROLE_CHOICES = (
     ("admin", "Admin"),
 )
 
+DEPARTEMENT_CHOICES = (
+    ("logistic", "logistic"),
+    ("media", "media"),
+    ("management", "management"),
+    ("other", "other"),
+)
+
 
 class user(AbstractUser):
     score = models.IntegerField(default=0)
@@ -15,3 +22,6 @@ class user(AbstractUser):
     )
 
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="user")
+    departement = models.CharField(
+        max_length=20, choices=DEPARTEMENT_CHOICES, default="other"
+    )

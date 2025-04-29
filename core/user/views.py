@@ -12,11 +12,17 @@ class ListUserView(ListAPIView):
     List all users.
     """
 
-    model = user
-    template_name = "user/list.html"
-    context_object_name = "users"
-
     def get_queryset(self):
+        query = self.request.query_params
+        if query.get("role") and query.get("departement"):
+            return user.objects.filter(
+                role=query.get("role"), departement=query.get("departement")
+            )
+        if query.get("role"):
+            return user.objects.filter(role=query.get("role"))
+        if query.get("departement"):
+            return user.objects.filter(departement=query.get("departement"))
+
         return user.objects.all()
 
     def get(self, request):
