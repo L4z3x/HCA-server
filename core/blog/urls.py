@@ -3,6 +3,7 @@ from blog.views import (
     create_blog,
     like_blog,
     dislike_blog,
+    list_writer_blogs,
     GetBlogView,
     BlogView,
     BlogListView,
@@ -16,6 +17,7 @@ urlpatterns = [
     path("details/<int:id>/", GetBlogView.as_view(), name="get blog"),
     path("<int:id>/", BlogView.as_view(), name="update blog"),
     path("<int:blog_id>/comments/", CommentListView.as_view(), name="get comments"),
+    path("writer-blogs/", list_writer_blogs, name="list writer blogs"),
     # comments:
     path("comment/<int:id>/", CommentView.as_view(), name="delete update comment"),
     path("comment/", CommentView.as_view(), name="create comment"),

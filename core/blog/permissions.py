@@ -10,7 +10,7 @@ class IsWriter(BasePermission):
         return (
             request.user
             and request.user.is_authenticated
-            and getattr(request.user, "role", None) == "writer"
+            and getattr(request.user, "role") == "writer"
         )
 
 
@@ -24,5 +24,5 @@ class IsAdmin(BasePermission):
         return (
             request.user
             and request.user.is_authenticated
-            and getattr(request.user, "role", None) == "admin"
+            and getattr(request.user, "role") == "admin"
         )

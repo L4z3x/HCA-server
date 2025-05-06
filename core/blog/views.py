@@ -1,6 +1,6 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from blog.permissions import IsWriter
+from blog.permissions import IsWriter, IsAdmin
 from rest_framework.response import Response
 from core.settings import BASE_URL
 from rest_framework import status
@@ -169,10 +169,10 @@ def like_blog(request, blog_id):
     user = request.user
     blog = Blog.objects.filter(id=blog_id).first()
     if not blog:
-        return Response({"error": "blog not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"detail": "blog not found"}, status=status.HTTP_404_NOT_FOUND)
 
     Like.objects.get_or_create(author=user, blog=blog)
-    return Response({"message": "blog liked successfully"}, status.HTTP_201_CREATED)
+    return Response({"detail": "blog liked successfully"}, status.HTTP_201_CREATED)
 
 
 @api_view(["DELETE"])
@@ -181,13 +181,33 @@ def dislike_blog(request, blog_id):
     user = request.user
     blog = Blog.objects.filter(id=blog_id).first()
     if not blog:
-        return Response({"error": "blog not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"detail": "blog not found"}, status=status.HTTP_404_NOT_FOUND)
 
     like = Like.objects.filter(author=user, blog=blog).first()
     if not like:
         return Response(
-            {"error": "You have not liked this blog"},
+            {"detail": "You have not liked this blog"},
             status=status.HTTP_400_BAD_REQUEST,
         )
     like.delete()
-    return Response({"message": "blog disliked successfully"}, status.HTTP_200_OK)
+    return Response({"detail": "blog disliked successfully"}, status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+@permission_classes([IsAdmin, IsWriter])
+def list_writer_blogs(request, **kwargs):
+    writer_id = request.query_params.get("id")
+    usr = request.user
+    if writer_id:
+        if usr.has_perm(IsAdmin):
+            usr = user.objects.filter(id=writer_id).first()
+            if not usr:
+                return Response({"detail": "id not found"}, status.HTTP_404_NOT_FOUND)
+        else:
+            return Response(
+                {"detail": "You do not have permission to perform this action."},
+                status.HTTP_403_FORBIDDEN,
+            )
+    blogs = usr.blogs.all()
+    serializer = BlogListSerializer(blogs, many=True)
+    return Response(serializer.data, status.HTTP_200_OK)
