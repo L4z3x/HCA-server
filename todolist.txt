@@ -1,0 +1,3 @@
+- change the permision to admin
+- remove email verification
+

@@ -41,8 +41,10 @@ INSTALLED_APPS = [
     # auth:
     "django.contrib.sites",
     "allauth",
-    "dj_rest_auth.registration",
     "allauth.account",
+    "allauth.socialaccount",
+    "dj_rest_auth.registration",
+    "dj_rest_auth",
     # local apps:
     "user",
     "blog",
@@ -80,7 +82,7 @@ REST_AUTH = {
     "USE_JWT": True,
     "JWT_AUTH_COOKIE": "access_token",
     "JWT_AUTH_REFRESH_COOKIE": "refresh_token",
-    "JWT_AUTH_REFRESH_COOKIE_PATH": "/auth/token/get-refresh/",
+    # "JWT_AUTH_REFRESH_COOKIE_PATH": "/auth/token/get-refresh/",
     "TOKEN_MODEL": None,
     "OLD_PASSWORD_FIELD_ENABLED": True,
     "JWT_AUTH_HTTPONLY": False,  # enable this to allow javascript to access the cookie (refresh token)
@@ -94,8 +96,10 @@ REST_AUTH = {
     "JWT_AUTH_SECURE": not DEBUG,  # False for development
     "JWT_AUTH_COOKIE_ENFORCE_CSRF_ON_UNAUTHENTICATED": not DEBUG,  # False for developement
     "USER_DETAILS_SERIALIZER": "user.serializers.UserSerializer",
-    # "REGISTER_SERIALIZER": "khatamat_b.serializers.CustomRegisterSerializer",
+    "REGISTER_SERIALIZER": "core.serializers.CustomRegisterSerializer",
+    # "USER_LOGIN_SERIALIZER":
 }
+
 
 SPECTACULAR_SETTINGS = {
     """
@@ -189,6 +193,14 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+ACCOUNT_EMAIL_VERIFICATION = "optional"
+
+
+ACCOUNT_UNIQUE_EMAIL = True
+
+ACCOUNT_SIGNUP_FIELDS = ["username*", "email*", "password1*", "password2*"]
+
+ACCOUNT_LOGIN_METHODS = {"email"}
 # Email backend configuration for local development
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
 EMAIL_FILE_PATH = BASE_DIR / "sent_emails"  # Directory to store sent emails

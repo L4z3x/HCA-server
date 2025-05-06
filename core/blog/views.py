@@ -158,7 +158,7 @@ class CommentView(UpdateAPIView, DestroyAPIView, CreateAPIView):
 
         return self.destroy(request, *args, **kwargs)
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         request.data["author"] = request.user.id
         return self.create(request)
 
