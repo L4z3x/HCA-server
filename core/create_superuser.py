@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 
 MyUser = get_user_model()
 
-ADMIN_ACCOUNT = os.environ.get("ADMIN_ACCOUNT", "admin@khatamat.test")
+ADMIN_ACCOUNT = os.environ.get("ADMIN_ACCOUNT", "admin@c.test")
 ADMIN_ACCOUNT_PASSWORD = os.environ.get("ADMIN_ACCOUNT_PASSWORD", "weakpass")
 
 

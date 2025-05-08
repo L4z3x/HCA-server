@@ -25,3 +25,9 @@ class user(AbstractUser):
     departement = models.CharField(
         max_length=20, choices=DEPARTEMENT_CHOICES, default="other"
     )
+    email = models.EmailField(unique=True)
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["username"]
+
+    def __str__(self):
+        return self.username
