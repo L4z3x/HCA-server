@@ -25,6 +25,7 @@ urlpatterns = [
     path("api/auth/registration/", include("dj_rest_auth.registration.urls")),
     path("api/blog/", include("blog.urls")),
     path("api/user/", include("user.urls")),
+    path("api/feedback/", include("feedback.urls")),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
