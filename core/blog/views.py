@@ -44,9 +44,6 @@ class BlogListView(ListAPIView):
     serializer_class = BlogListSerializer
     queryset = Blog.objects.all().order_by("-created_at")
 
-    def get(self, request):
-        return self.list(request)
-
 
 class GetBlogView(RetrieveAPIView):
     """
@@ -59,24 +56,6 @@ class GetBlogView(RetrieveAPIView):
 
     def get_queryset(self):
         return Blog.objects.filter(id=self.kwargs.get("id"))
-
-    def get(self, request, *args, **kwargs):
-        res = self.retrieve(request, *args, **kwargs)
-        if res.status_code == 200:
-            author_id = res.data["author"]
-            author = user.objects.filter(id=author_id).first()
-            if author:
-                res.data["author"] = {
-                    "id": author.id,
-                    "username": author.username,
-                    "profilePic": f"{BASE_URL}{author.profilePic.url}"
-                    if author.profilePic
-                    else None,
-                }
-            else:
-                res.data["author"] = None
-            res.data["author_username"] = res.data["author"].get("username")
-        return res
 
 
 class BlogView(UpdateAPIView, DestroyAPIView):
@@ -102,23 +81,6 @@ class CommentListView(ListAPIView):
 
     def get_queryset(self):
         return Comment.objects.filter(blog=self.kwargs.get("blog_id"))
-
-    def get(self, request, *args, **kwargs):
-        res = self.list(request, *args, **kwargs)
-        for comment in res.data["results"]:
-            author_id = comment["author"]
-            author = user.objects.filter(id=author_id).first()
-            if author:
-                comment["author"] = {
-                    "id": author.id,
-                    "username": author.username,
-                    "profilePic": f"{BASE_URL}{author.profilePic.url}"
-                    if author.profilePic
-                    else None,
-                }
-            else:
-                comment["author"] = None
-        return res
 
 
 class CommentView(UpdateAPIView, DestroyAPIView, CreateAPIView):

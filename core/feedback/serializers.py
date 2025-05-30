@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import ContactUs, ReportIssue, ReportComment
+from blog.serializers import ShortUserSerializer
 
 
 class ContactUsSerializer(serializers.ModelSerializer):
@@ -27,6 +28,9 @@ class ReportIssueSerializer(serializers.ModelSerializer):
 
 
 class ReportCommentSerializer(serializers.ModelSerializer):
+    reported_by = ShortUserSerializer(read_only=True)
+    comment = serializers.CharField(source="comment.body", read_only=True)
+
     class Meta:
         model = ReportComment
         fields = "__all__"

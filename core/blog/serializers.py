@@ -1,10 +1,19 @@
-from rest_framework.serializers import ModelSerializer, IntegerField
-from .models import Blog, Comment
+from rest_framework.serializers import ModelSerializer, CharField, IntegerField
+from blog.models import Blog, Comment
+from user.models import user
+
+
+class ShortUserSerializer(ModelSerializer):
+    class Meta:
+        model = user
+        fields = ["id", "username", "profilePic"]
+        read_only_fields = ["id", "username", "profilePic"]
 
 
 class BlogSerializer(ModelSerializer):
     like = IntegerField(source="likes.count", read_only=True)
     comment = IntegerField(source="comments.count", read_only=True)
+    author = ShortUserSerializer(read_only=True)
 
     class Meta:
         model = Blog
@@ -56,6 +65,8 @@ class BlogListSerializer(ModelSerializer):
 
 
 class CommentSerializer(ModelSerializer):
+    author = ShortUserSerializer(read_only=True)
+
     class Meta:
         model = Comment
         fields = [
