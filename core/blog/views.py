@@ -61,11 +61,14 @@ class GetBlogView(RetrieveAPIView):
         res = self.retrieve(request, *args, **kwargs)
         if res.status_code == status.HTTP_200_OK:
             user = request.user
-            like = Like.objects.filter(author=user, blog=res.data["id"]).first()
-            if like:
-                res.data["liked"] = True
-            else:
+            if not user:
                 res.data["liked"] = False
+            else:
+                like = Like.objects.filter(author=user.id, blog=res.data["id"]).first()
+                if not like:
+                    res.data["liked"] = False
+                else:
+                    res.data["liked"] = True
         return res
 
 
