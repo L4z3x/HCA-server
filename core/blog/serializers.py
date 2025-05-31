@@ -68,7 +68,7 @@ class BlogListSerializer(ModelSerializer):
 
 
 class CommentSerializer(ModelSerializer):
-    author = ShortUserSerializer(read_only=True)
+    author = ShortUserSerializer()
 
     class Meta:
         model = Comment
@@ -83,5 +83,10 @@ class CommentSerializer(ModelSerializer):
         read_only_fields = ["id", "created_at", "updated_at"]
         extra_kwargs = {
             "body": {"required": True},
-            "author": {"required": False},
+            "author": {"required": True},
         }
+
+    def create(self, validated_data):
+        author = self.context["request"].user
+        validated_data["author"] = author
+        return super().create(validated_data)

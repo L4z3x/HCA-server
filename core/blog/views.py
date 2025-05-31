@@ -127,7 +127,15 @@ class CommentView(UpdateAPIView, DestroyAPIView, CreateAPIView):
         return self.destroy(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        request.data["author"] = request.user.id
+        author = {
+            "username": request.user.username,
+            "id": request.user.id,
+            "profilePic": request.user.profilePic.url
+            if request.user.profilePic
+            else None,
+        }
+        request.data["author"] = author
+        print(request.data)
         return self.create(request)
 
 
