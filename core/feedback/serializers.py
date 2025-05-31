@@ -40,3 +40,8 @@ class ReportCommentSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         if request and not request.user.has_perm("blog.permissions.IsAdmin"):
             self.fields["status"].read_only = True
+
+    def create(self, validated_data):
+        reported_by = self.context["request"].user
+        validated_data["reported_by"] = reported_by
+        return super().create(validated_data)

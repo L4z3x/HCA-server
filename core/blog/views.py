@@ -138,7 +138,7 @@ class CommentView(UpdateAPIView, DestroyAPIView, CreateAPIView):
             else None,
         }
         request.data["author"] = author
-        print(request.data)
+        # print(request.data)
         return self.create(request)
 
 
