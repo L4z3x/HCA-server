@@ -58,10 +58,9 @@ class ReportComment(models.Model):
     reason = models.TextField()
     reported_by = models.ForeignKey(
         "user.user",
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         related_name="reporter",
-        null=True,
-        blank=True,
+        null=False,
     )
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(
