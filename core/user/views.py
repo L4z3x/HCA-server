@@ -1,7 +1,7 @@
 from user.models import user
 from rest_framework.generics import ListAPIView
 from user.serializers import UserSerializer
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
@@ -58,6 +58,7 @@ def update_user(request):
 
 
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def get_top_three_members(request):
     """
     Get top three users with the highest scores.
