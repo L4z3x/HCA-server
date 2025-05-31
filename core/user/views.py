@@ -55,3 +55,13 @@ def update_user(request):
         usr.role = role if role else usr.role
         usr.save()
     return Response({"success": "Users updated successfully"}, status=200)
+
+
+@api_view(["GET"])
+def get_top_three_members(request):
+    """
+    Get top three users with the highest scores.
+    """
+    top_users = user.objects.order_by("-score")[:3]
+    serializer = UserSerializer(top_users, many=True)
+    return Response(serializer.data, status=200)
