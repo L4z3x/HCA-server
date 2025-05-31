@@ -8,6 +8,7 @@ class Blog(models.Model):
         "user.user", related_name="blogs", null=False, on_delete=models.CASCADE
     )
     thumbnail = models.ImageField(upload_to="blog-thumbnails/", null=True, blank=True)
+    description = models.TextField(null=False, max_length=120)
     # tags = models.CharField(max_length=100, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -17,7 +18,6 @@ class Comment(models.Model):
     blog = models.ForeignKey(
         "blog.Blog", related_name="comments", null=False, on_delete=models.CASCADE
     )
-
     author = models.ForeignKey(
         "user.user", related_name="comments", null=False, on_delete=models.CASCADE
     )

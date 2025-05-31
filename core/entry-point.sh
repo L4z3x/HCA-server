@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# exit on error
+set -o errexit
 
 # Colors
 GREEN="\033[0;32m"
@@ -36,5 +38,5 @@ echo -e "${YELLOW}==> Creating superuser...${NC}"
 cat create_superuser.py | python3 manage.py shell
 # fi
 echo -e "${GREEN}==> Starting the Server${NC}"
-python3 manage.py runserver
+python3  manage.py runserver
 

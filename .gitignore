@@ -6,7 +6,8 @@ app/static/*
 media/*
 # schema file
 schema.yml
-
+app.env
+staticfiles/
 # github gitignore file for python
 
 # Byte-compiled / optimized / DLL files

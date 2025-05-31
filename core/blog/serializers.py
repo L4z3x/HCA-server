@@ -22,6 +22,7 @@ class BlogSerializer(ModelSerializer):
             "title",
             "like",
             "comment",
+            "description",
             "body",
             "author",
             "created_at",
@@ -37,6 +38,7 @@ class BlogSerializer(ModelSerializer):
         extra_kwargs = {
             "title": {"required": True},
             "body": {"required": True},
+            "description": {"required": True},
             "thumbnail": {"required": False},
         }
 
@@ -52,6 +54,7 @@ class BlogListSerializer(ModelSerializer):
             "like",
             "comment",
             "title",
+            "description",
             "author",
             "thumbnail",
             "created_at",

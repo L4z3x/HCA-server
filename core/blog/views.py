@@ -57,6 +57,17 @@ class GetBlogView(RetrieveAPIView):
     def get_queryset(self):
         return Blog.objects.filter(id=self.kwargs.get("id"))
 
+    def get(self, request, *args, **kwargs):
+        res = self.retrieve(request, *args, **kwargs)
+        if res.status_code == status.HTTP_200_OK:
+            user = request.user
+            like = Like.objects.filter(author=user, blog=res.data["id"]).first()
+            if like:
+                res.data["liked"] = True
+            else:
+                res.data["liked"] = False
+        return res
+
 
 class BlogView(UpdateAPIView, DestroyAPIView):
     # permission_classes = [IsWriter]
@@ -66,12 +77,6 @@ class BlogView(UpdateAPIView, DestroyAPIView):
 
     def get_queryset(self):
         return Blog.objects.filter(id=self.kwargs.get("id"))
-
-    def put(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
 
 
 class CommentListView(ListAPIView):
@@ -91,6 +96,7 @@ class CommentView(UpdateAPIView, DestroyAPIView, CreateAPIView):
     def get_queryset(self):
         return Comment.objects.filter(id=self.kwargs.get("id"))
 
+    # only the author of the comment can update or delete it
     def put(self, request, *args, **kwargs):
         user = request.user
         comment = self.get_object()
@@ -98,7 +104,7 @@ class CommentView(UpdateAPIView, DestroyAPIView, CreateAPIView):
             return Response(
                 {"error": "Comment not found"}, status=status.HTTP_404_NOT_FOUND
             )
-        if comment.author != user and not user.role == "admin":
+        if comment.author != user:
             return Response(
                 {"error": "You are not allowed to update this comment"},
                 status=status.HTTP_403_FORBIDDEN,
