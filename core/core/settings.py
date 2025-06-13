@@ -1,11 +1,21 @@
 from pathlib import Path
 from datetime import timedelta
+from dotenv import load_dotenv
+import dj_database_url
+
+load_dotenv("../app.env")
+load_dotenv()
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "django-insecure-s4r7za-8fuu%vfr$(ra!1!lo5wb8a6a=a3vd@0w(6en9w%pudz"
 
-DEBUG = True
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY", "django-insecure-s4r7za-8fuu%vfr$(ra!1!lo5wb8a6a=a3vd@0w(6en9w%pudz"
+)
+
+
+DEBUG = os.environ.get("DEBUG", "True").lower() in ("true", "1", "yes")
 
 LANGUAGE_CODE = "en-us"
 
@@ -17,11 +27,12 @@ USE_I18N = True
 
 USE_TZ = True
 
-STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 TOKEN_MODEL = None
+
+BASE_URL = "http://localhost:8000"
 
 
 INSTALLED_APPS = [
@@ -50,18 +61,23 @@ INSTALLED_APPS = [
     "feedback",
     "blog",
 ]
-
+# ===== CORS and CSRF settings =====
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
-
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
 CORS_ALLOWS_CREDENTIALS = True
-
-BASE_URL = "http://localhost:8000"
 
 ALLOWED_HOSTS = ["*"]
 
+CSRF_COOKIE_SECURE = True if not DEBUG else False
+
+
+# ==== Django REST Framework settings ====
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -83,7 +99,6 @@ REST_AUTH = {
     "USE_JWT": True,
     "JWT_AUTH_COOKIE": "access_token",
     "JWT_AUTH_REFRESH_COOKIE": "refresh_token",
-    # "JWT_AUTH_REFRESH_COOKIE_PATH": "/auth/token/get-refresh/",
     "TOKEN_MODEL": None,
     "OLD_PASSWORD_FIELD_ENABLED": True,
     "JWT_AUTH_HTTPONLY": False,  # enable this to allow javascript to access the cookie (refresh token)
@@ -94,11 +109,9 @@ REST_AUTH = {
     we must not send access_tokens (cookie) in requests to the allowAny endpoints e.g. login
     https://forum.djangoproject.com/t/solved-allowany-override-does-not-work-on-apiview/9754
     """
-    "JWT_AUTH_SECURE": not DEBUG,  # False for development
-    "JWT_AUTH_COOKIE_ENFORCE_CSRF_ON_UNAUTHENTICATED": not DEBUG,  # False for developement
+    "JWT_AUTH_SECURE": DEBUG,  # False for development
     "USER_DETAILS_SERIALIZER": "user.serializers.UserSerializer",
     "REGISTER_SERIALIZER": "core.serializers.CustomRegisterSerializer",
-    # "USER_LOGIN_SERIALIZER":
 }
 
 
@@ -137,46 +150,25 @@ SIMPLE_JWT = {
     "JTI_CLAIM": "jti",
 }
 
-CSRF_COOKIE_SECURE = False
+# ==== Database settings ====
 
-MIDDLEWARE = [
-    "django.middleware.security.SecurityMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
-    "allauth.account.middleware.AccountMiddleware",
-]
-
-ROOT_URLCONF = "core.urls"
-
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-            ],
-        },
-    },
-]
-
-WSGI_APPLICATION = "core.wsgi.application"
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+if not DEBUG:
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=os.environ.get("DATABASE_URL"),
+            conn_max_age=600,
+        )
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
+
+
+# ==== Authentication settings ====
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -194,6 +186,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+# === Allauth settings ===
+
 ACCOUNT_EMAIL_VERIFICATION = "optional"
 
 
@@ -202,9 +196,63 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_SIGNUP_FIELDS = ["username*", "email*", "password1*", "password2*"]
 
 ACCOUNT_LOGIN_METHODS = {"email"}
-# Email backend configuration for local development
-EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
-EMAIL_FILE_PATH = BASE_DIR / "sent_emails"  # Directory to store sent emails
 
-MEDIA_URL = "media/"
-MEDIA_ROOT = BASE_DIR / "media"
+
+# ==== Email settings ====
+
+if DEBUG:
+    EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+    EMAIL_FILE_PATH = BASE_DIR / "sent_emails"  # Directory to store sent emails
+
+
+# ==== Google Drive settings ====
+GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON = os.environ.get("GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON")
+PROFILE_PIC_FOLDER_ID = os.environ.get("GOOGLE_DRIVE_PROFILE_PIC_FOLDER_ID")
+BLOG_THUMBNAIL_FOLDER_ID = os.environ.get("GOOGLE_DRIVE_BLOG_THUMBNAIL_FOLDER_ID")
+
+
+# ==== Middlewares ====
+
+
+MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+]
+
+
+# === Static files (CSS, JavaScript, Images) ====
+STATIC_URL = "/static/"
+
+if not DEBUG:
+    # Tell Django to copy static assets into a path called `staticfiles` (this is specific to Render)
+    STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+WSGI_APPLICATION = "core.wsgi.application"
+
+ROOT_URLCONF = "core.urls"
+
+
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
+]

@@ -15,11 +15,25 @@ DEPARTEMENT_CHOICES = (
 )
 
 
+def rename_upload(
+    instance,
+    filename,
+):
+    ext = filename.split(".")[-1]
+    folder = (
+        "profile-pics"
+        if instance.__class__.__name__.lower() == "user"
+        else "blog-thumbnails"
+        if instance.__class__.__name__.lower() == "blog"
+        else "other"  # default folder
+    )
+
+    return f"{folder}/{instance.id}.{ext}"
+
+
 class user(AbstractUser):
     score = models.IntegerField(default=0)
-    profilePic = models.ImageField(
-        upload_to="profile_pics/", default="profile_pics/default.jpg"
-    )
+    profilePic = models.URLField(null=True)
 
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="user")
     departement = models.CharField(

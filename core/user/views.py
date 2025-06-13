@@ -2,13 +2,14 @@ from user.models import user
 from rest_framework.generics import ListAPIView
 from user.serializers import UserSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from blog.permissions import IsAdmin
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
 
 class ListUserView(ListAPIView):
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]  # TODO: Change to admin
+    permission_classes = [IsAdmin]
 
     """
     List all users.
@@ -31,7 +32,7 @@ class ListUserView(ListAPIView):
         return self.list(request)
 
 
-@permission_classes([IsAuthenticated])  # TODO: Change to admin
+@permission_classes([IsAdmin])
 @api_view(["POST"])
 def update_user(request):
     """

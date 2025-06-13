@@ -7,11 +7,14 @@ class Blog(models.Model):
     author = models.ForeignKey(
         "user.user", related_name="blogs", null=False, on_delete=models.CASCADE
     )
-    thumbnail = models.ImageField(upload_to="blog-thumbnails/", null=True, blank=True)
+    thumbnail = models.URLField()
     description = models.TextField(null=False, max_length=120)
     # tags = models.CharField(max_length=100, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
 
 
 class Comment(models.Model):
@@ -25,6 +28,9 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return f"Comment by {self.author.username} on {self.blog.title}"
+
 
 class Like(models.Model):
     author = models.ForeignKey(
@@ -36,3 +42,6 @@ class Like(models.Model):
 
     class Meta:
         unique_together = ("author", "blog")
+
+    def __str__(self):
+        return f"{self.author.username} on {self.blog.title}"

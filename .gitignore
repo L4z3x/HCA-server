@@ -3,7 +3,7 @@ db.sqlite3
 backend_static/*
 app/static/*
 # media
-media/*
+media/
 # schema file
 schema.yml
 app.env
@@ -11,7 +11,8 @@ staticfiles/
 # github gitignore file for python
 
 # Byte-compiled / optimized / DLL files
-*/__pycache__/
+__pycache__/
+**/__pycache__/
 *.py[cod]
 *$py.class
 

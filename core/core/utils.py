@@ -1,19 +1,35 @@
-from imagekitio import ImageKit
-from imagekitio.models.UploadFileRequestOptions import UploadFileRequestOptions
-from core.settings import (
-    IMAGEKIT_URL_ENDPOINT,
-    IMAGEKIT_PRIVATE_API_KEY,
-    IMAGEKIT_PUBLIC_API_KEY,
-)
+import json
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaIoBaseUpload
+from core.settings import GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON
 
-imagekit = ImageKit(
-    private_key=IMAGEKIT_PRIVATE_API_KEY,
-    public_key=IMAGEKIT_PUBLIC_API_KEY,
-    url_endpoint=IMAGEKIT_URL_ENDPOINT,
-)
+SCOPES = ["https://www.googleapis.com/auth/drive"]
 
 
-def upload_media(file, file_name, folder):
-    # check if path exists and then create it if it doesn't and then upload the file to that path folder
-    upload_options = UploadFileRequestOptions(folder=folder)
-    return imagekit.upload_file(file=file, file_name=file_name, options=upload_options)
+def get_drive_service():
+    if not GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON:
+        raise RuntimeError("Service account JSON not found in env var.")
+
+    info = json.loads(GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON)
+    creds = service_account.Credentials.from_service_account_info(info, scopes=SCOPES)
+    return build("drive", "v3", credentials=creds)
+
+
+def upload_to_drive(file, filename: str, folder: str):
+    service = get_drive_service()
+    media = MediaIoBaseUpload(file, mimetype="image/jpeg")
+    file_metadata = {
+        "name": filename,
+        "parents": [folder],
+    }
+    file = (
+        service.files()
+        .create(
+            body=file_metadata,
+            media_body=media,
+            fields="id, name",
+        )
+        .execute()
+    )
+    return file
