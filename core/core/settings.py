@@ -32,8 +32,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 TOKEN_MODEL = None
 
-BASE_URL = "http://localhost:8000"
-
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -62,14 +60,23 @@ INSTALLED_APPS = [
     "blog",
 ]
 # ===== CORS and CSRF settings =====
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
+if DEBUG:
+    CORS_ALLOWED_ORIGINS = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ]
+    CSRF_TRUSTED_ORIGINS = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ]
+else:
+    CSRF_TRUSTED_ORIGINS = [
+        os.environ.get("FRONTEND_URL", "http://localhost:3000"),
+    ]
+    CORS_ALLOWED_ORIGINS = [
+        os.environ.get("FRONTEND_URL", "http://localhost:3000"),
+    ]
+
 CORS_ALLOWS_CREDENTIALS = True
 
 ALLOWED_HOSTS = ["*"]
