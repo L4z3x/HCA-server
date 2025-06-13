@@ -2,7 +2,6 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from blog.permissions import IsWriter, IsAdmin
 from rest_framework.response import Response
-from core.settings import BASE_URL
 from rest_framework import status
 from blog.serializers import BlogSerializer, CommentSerializer, BlogListSerializer
 from blog.models import Blog, Comment, Like
