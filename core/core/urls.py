@@ -16,21 +16,18 @@ urlpatterns = [
     path("api/user/", include("user.urls")),
     path("api/feedback/", include("feedback.urls")),
 ]
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + (
+if settings.DEBUG and not settings.PROD:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += [
         path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
-    )
-    (
         path(
             "api/schema/docs/",
             SpectacularSwaggerView.as_view(url_name="schema"),
             name="api docs",
         ),
-    )
-    (
         path(
             "api/schema/redoc/",
             SpectacularRedocView.as_view(url_name="schema"),
             name="redoc",
         ),
-    )
+    ]
