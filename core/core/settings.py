@@ -137,9 +137,7 @@ SPECTACULAR_SETTINGS = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(
-        min=15
-    ),  # TODO: change to 15 minutes in production
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=15),
     "ROTATE_REFRESH_TOKENS": True,  # automatically rotate refresh tokens
     "BLACKLIST_AFTER_ROTATION": True,  # old refresh tokens will be blacklisted
