@@ -66,7 +66,7 @@ class BlogSerializer(ModelSerializer):
             validated_data.pop("thumbnailFile")
             return super().create(validated_data)
         else:
-            return Response({"error": "Thumbnail image is required."}, status=400)
+            return Response({"error": "ThumbnailFile image is required."}, status=400)
 
 
 class BlogListSerializer(ModelSerializer):

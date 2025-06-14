@@ -36,9 +36,7 @@ class ReportCommentCreateView(generics.CreateAPIView):
         reported_by = {
             "username": request.user.username,
             "id": request.user.id,
-            "profilePic": request.user.profilePic.url
-            if request.user.profilePic
-            else None,
+            "profilePic": request.user.profilePic,
         }
         print(reported_by)
         request.data["reported_by"] = reported_by

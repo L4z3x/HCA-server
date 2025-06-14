@@ -132,9 +132,7 @@ class CommentView(UpdateAPIView, DestroyAPIView, CreateAPIView):
         author = {
             "username": request.user.username,
             "id": request.user.id,
-            "profilePic": request.user.profilePic.url
-            if request.user.profilePic
-            else None,
+            "profilePic": request.user.profilePic,
         }
         request.data["author"] = author
         # print(request.data)
