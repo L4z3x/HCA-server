@@ -1,7 +1,6 @@
 from rest_framework.serializers import ModelSerializer, ImageField
 from user.models import user
-from core.utils import upload_to_drive
-from core.settings import PROFILE_PIC_FOLDER_ID
+from core.utils import upload_image
 
 
 class UserSerializer(ModelSerializer):
@@ -30,15 +29,8 @@ class UserSerializer(ModelSerializer):
 
     def update(self, instance, validated_data):
         image = validated_data.get("profilePicFile", None)
-        print(image)
-
         if image:
-            filename = f"{instance.id}.{image.name.split('.')[-1]}"
-            if not filename:
-                filename = f"{instance.id}.jpg"
-            file = upload_to_drive(image, filename, PROFILE_PIC_FOLDER_ID)
-            validated_data["profilePic"] = (
-                f"https://drive.google.com/uc?export=view&id={file['id']}"
-            )
-        print(validated_data["profilePic"])
+            filename = f"{instance.username}_{instance.id}"
+            file = upload_image(image, filename, folder="profile-pics")
+            validated_data["profilePic"] = file["secure_url"]
         return super().update(instance, validated_data)

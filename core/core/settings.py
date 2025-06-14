@@ -190,8 +190,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # === Allauth settings ===
 
-ACCOUNT_EMAIL_VERIFICATION = "optional"
-
+ACCOUNT_EMAIL_VERIFICATION = "none"  # TODO: change to "optional" in production
 
 ACCOUNT_UNIQUE_EMAIL = True
 
@@ -205,13 +204,15 @@ ACCOUNT_LOGIN_METHODS = {"email"}
 if not PROD:
     EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
     EMAIL_FILE_PATH = BASE_DIR / "sent_emails"  # Directory to store sent emails
-
-
-# ==== Google Drive settings ====
-GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON = os.environ.get("GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON")
-PROFILE_PIC_FOLDER_ID = os.environ.get("GOOGLE_DRIVE_PROFILE_PIC_FOLDER_ID")
-BLOG_THUMBNAIL_FOLDER_ID = os.environ.get("GOOGLE_DRIVE_BLOG_THUMBNAIL_FOLDER_ID")
-
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"  # Production
+    EMAIL_HOST = "smtp.gmail.com"
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_USE_SSL = False
+    EMAIL_HOST_USER = os.environ.get("EMAIL_USER")
+    EMAIL_HOST_PASSWORD = os.environ.get("APP_PASSWORD")
+    DEFAULT_FROM_EMAIL = os.environ.get("EMAIL_USER")
 
 # ==== Middlewares ====
 

@@ -1,8 +1,8 @@
 from rest_framework.serializers import ModelSerializer, ImageField, IntegerField
 from blog.models import Blog, Comment
 from user.models import user
-from core.settings import BLOG_THUMBNAIL_FOLDER_ID
-from core.utils import upload_to_drive
+from rest_framework.response import Response
+from core.utils import upload_image
 
 
 class ShortUserSerializer(ModelSerializer):
@@ -44,34 +44,29 @@ class BlogSerializer(ModelSerializer):
             "title": {"required": True},
             "body": {"required": True},
             "description": {"required": True},
+            "thumbnailFile": {"required": True, "write_only": True},
             "thumbnail": {"read_only": True},
         }
 
     def update(self, instance, validated_data):
         image = validated_data.get("thumbnailFile", None)
-        if image:
-            filename = f"{validated_data['title']}.{image.name.split('.')[-1]}"
-            if not filename:
-                filename = f"{validated_data['title']}.jpg"
-            file = upload_to_drive(image, filename, BLOG_THUMBNAIL_FOLDER_ID)
-            validated_data["thumbnail"] = (
-                f"https://drive.google.com/uc?export=view&id={file['id']}"
-            )
+        if image is not None:
+            filename = f"{instance.title}"
+            file = upload_image(image, filename, folder="blog-thumbnails")
+            validated_data["thumbnail"] = file["secure_url"]
             validated_data.pop("thumbnailFile")
         return super().update(instance, validated_data)
 
     def create(self, validated_data):
         image = validated_data.get("thumbnailFile", None)
-
-        filename = f"{validated_data['title']}.{image.name.split('.')[-1]}"
-        if not filename:
-            filename = f"{validated_data['title']}.jpg"
-        file = upload_to_drive(image, filename, BLOG_THUMBNAIL_FOLDER_ID)
-        validated_data["thumbnail"] = (
-            f"https://drive.google.com/uc?export=view&id={file['id']}"
-        )
-        validated_data.pop("thumbnailFile")
-        return super().create(validated_data)
+        if image:
+            filename = f"{validated_data['title']}"
+            file = upload_image(image, filename, folder="blog-thumbnails")
+            validated_data["thumbnail"] = file["secure_url"]
+            validated_data.pop("thumbnailFile")
+            return super().create(validated_data)
+        else:
+            return Response({"error": "Thumbnail image is required."}, status=400)
 
 
 class BlogListSerializer(ModelSerializer):
