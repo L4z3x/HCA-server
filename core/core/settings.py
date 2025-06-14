@@ -27,6 +27,7 @@ USE_I18N = True
 
 USE_TZ = True
 
+PROD = os.environ.get("PROD", "False").lower() in ("true", "1", "yes")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -60,7 +61,7 @@ INSTALLED_APPS = [
     "blog",
 ]
 # ===== CORS and CSRF settings =====
-if DEBUG:
+if not PROD:
     CORS_ALLOWED_ORIGINS = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",
@@ -131,17 +132,15 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "HCA API documentation",
     "OPERATION_ID_GENERATOR": "drf_spectacular.utils.simple_operation_id_generator",
     "SERVE_INCLUDE_SCHEMA": False,
-    "SERVE_PERMISSIONS": [
-        "rest_framework.permissions.AllowAny"
-    ],  # change to IsAdminUser in prod
+    "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAdminUser"],
     "SERVE_URLCONF": "core.urls",
 }
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(
-        days=100
+        min=15
     ),  # TODO: change to 15 minutes in production
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=20),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=15),
     "ROTATE_REFRESH_TOKENS": True,  # automatically rotate refresh tokens
     "BLACKLIST_AFTER_ROTATION": True,  # old refresh tokens will be blacklisted
     "ALGORITHM": "HS256",
@@ -159,7 +158,7 @@ SIMPLE_JWT = {
 
 # ==== Database settings ====
 
-if not DEBUG:
+if not PROD:
     DATABASES = {
         "default": dj_database_url.config(
             default=os.environ.get("DATABASE_URL"),
@@ -207,7 +206,7 @@ ACCOUNT_LOGIN_METHODS = {"email"}
 
 # ==== Email settings ====
 
-if DEBUG:
+if not PROD:
     EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
     EMAIL_FILE_PATH = BASE_DIR / "sent_emails"  # Directory to store sent emails
 
@@ -238,7 +237,7 @@ MIDDLEWARE = [
 # === Static files (CSS, JavaScript, Images) ====
 STATIC_URL = "/static/"
 
-if not DEBUG:
+if PROD:
     # Tell Django to copy static assets into a path called `staticfiles` (this is specific to Render)
     STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
